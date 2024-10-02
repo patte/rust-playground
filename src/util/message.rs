@@ -1,7 +1,7 @@
 use bit_vec::BitVec;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Message {
     pub id: u32,
     pub content: String,
