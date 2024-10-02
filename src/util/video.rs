@@ -6,10 +6,7 @@ use std::process::Command;
 pub fn write_video(data: &BitVec, fps: u32, width: u32, height: u32) {
     let total_frames = data.len();
     let duration_seconds = total_frames as f64 / fps as f64;
-    println!(
-        "Total frames: {} duration: {}s",
-        total_frames, duration_seconds
-    );
+    println!("frames: {} duration: {}s", total_frames, duration_seconds);
 
     // Create a directory for the frames
     let frames_dir = "frames";
