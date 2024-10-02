@@ -8,6 +8,8 @@ const CRC: Crc<u8> = Crc::<u8>::new(&CRC_8_BLUETOOTH); // 8-bit CRC
 
 // overhead = 8 bits preamble + 8 bits size + 8 bits CRC = 24 bits
 // => 24 bits / 30 fps = 0.8 seconds
+// 1 byte at 30 fps = 0.266 ms
+// 1 byte at 60 fps = 0.133 ms
 
 pub fn get_preamble() -> BitVec {
     BitVec::from_bytes(&[0b10101010])

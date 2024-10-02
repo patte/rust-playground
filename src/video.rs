@@ -10,7 +10,16 @@ fn main() {
     let encoded_data = BitVec::from_bytes(&[0b11001110, 0b00110001]);
     let decoded_package = send_receive(&encoded_data);
     println!("Decoded: {:?}", decoded_package);
+    println!("");
     assert_eq!(encoded_data, decoded_package);
+
+    let text_message = "https://github.com/patte";
+    let encoded_message = BitVec::from_bytes(&text_message.to_string().into_bytes());
+    let decoded_package = send_receive(&encoded_message);
+    let decoded_message = String::from_utf8(decoded_package.to_bytes()).unwrap();
+    println!("Decoded: {:?}", decoded_message);
+    println!("");
+    assert_eq!(text_message, decoded_message);
 
     let message = Message {
         id: 1,
@@ -40,8 +49,8 @@ fn send_receive(data: &BitVec) -> BitVec {
 
     let decoded_package = decode_package(&received_data).unwrap();
 
-    //println!("Decoded Package: {:?}", decoded_package);
     //println!("Sent Data:       {:?}", package_data);
+    //println!("Decoded Package: {:?}", decoded_package);
     //println!("Received data:   {:?}", received_data);
     //println!("Received Package length: {} bits", &received_data.len());
     println!(
