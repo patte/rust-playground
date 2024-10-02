@@ -1,13 +1,13 @@
 use bit_vec::BitVec;
-use crc::{Crc, CRC_16_IBM_SDLC};
+use crc::{Crc, CRC_8_BLUETOOTH};
 
 const PREABLE_LEN: usize = 8;
-const SIZE_LEN: usize = 16;
-const CRC_LEN: usize = 16;
-const X25: Crc<u16> = Crc::<u16>::new(&CRC_16_IBM_SDLC); // 16-bit CRC
+const SIZE_LEN: usize = 8;
+const CRC_LEN: usize = 8;
+const CRC: Crc<u8> = Crc::<u8>::new(&CRC_8_BLUETOOTH); // 8-bit CRC
 
-// overhead = 8 bits preamble + 16 bits size + 16 bits CRC = 40 bits
-// => 40 bits / 30 fps = 1.33 seconds
+// overhead = 8 bits preamble + 8 bits size + 8 bits CRC = 24 bits
+// => 24 bits / 30 fps = 0.8 seconds
 
 pub fn get_preamble() -> BitVec {
     BitVec::from_bytes(&[0b10101010])
@@ -23,49 +23,48 @@ pub fn encode_package(data: &BitVec) -> BitVec {
     let data_bytes = data.to_bytes();
 
     // add size in bytes
-    if data_bytes.len() > u16::MAX as usize {
+    if data_bytes.len() > u8::MAX as usize {
         panic!("Data too large for size field");
     }
-    let size = data_bytes.len() as u16;
+    let size = data_bytes.len() as u8;
     package.extend(BitVec::from_bytes(&size.to_be_bytes()).iter());
 
     // Add data
     package.extend(data.iter());
 
     // add CRC of data
-    //let crc_value = X25.checksum(&package.to_bytes()[8..]);
-    let crc_value = X25.checksum(&data_bytes);
+    let crc_value = CRC.checksum(&data_bytes);
     package.extend(BitVec::from_bytes(&crc_value.to_be_bytes()).iter());
 
     package
 }
 
 // BitVec doesn't support slice access
-//let size_bytes: [u8; SIZE_BYTES] = [package_bytes[size_index], package_bytes[size_index + 1]];
 pub fn decode_package(package_bits: &BitVec) -> Option<BitVec> {
     // find preamble
     let preamble_bits = get_preamble();
-    let mut preamble_index = None;
     for i in 0..package_bits.len() {
         let window = package_bits.iter().skip(i).take(PREABLE_LEN);
         if window.eq(preamble_bits.iter()) {
-            preamble_index = Some(i);
-            break;
+            let preamble_index = i;
+            let package = decode_package_at_index(&package_bits, preamble_index + PREABLE_LEN);
+            if package.is_some() {
+                return package;
+            }
         }
     }
 
-    if preamble_index.is_none() {
-        println!("Preamble not found");
-        return None;
-    }
+    return None;
+}
 
+fn decode_package_at_index(package_bits: &BitVec, start_index: usize) -> Option<BitVec> {
     // read size
-    let size_index = preamble_index.unwrap() + PREABLE_LEN;
+    let size_index = start_index;
     if !check_within_bounds(&package_bits, size_index, SIZE_LEN) {
         println!("Size out of bounds");
         return None;
     }
-    let size = read_two_bytes(&package_bits, size_index);
+    let size = read_one_byte(&package_bits, size_index);
     let data_index = size_index + SIZE_LEN;
     let crc_index = data_index + size as usize * 8;
 
@@ -82,10 +81,10 @@ pub fn decode_package(package_bits: &BitVec) -> Option<BitVec> {
         .collect();
 
     // read CRC
-    let crc = read_two_bytes(&package_bits, crc_index);
+    let crc = read_one_byte(&package_bits, crc_index);
     // check CRC
     let data_bytes = data.to_bytes();
-    let crc_value = X25.checksum(&data_bytes);
+    let crc_value = CRC.checksum(&data_bytes);
     if crc != crc_value {
         println!("CRC mismatch: {} != {}", crc, crc_value);
         return None;
@@ -101,16 +100,16 @@ pub fn decode_package(package_bits: &BitVec) -> Option<BitVec> {
     Some(data)
 }
 
-fn read_two_bytes(data: &BitVec, start: usize) -> u16 {
-    let bytes: [u8; 2] = data
+fn read_one_byte(data: &BitVec, start: usize) -> u8 {
+    let bytes: [u8; 1] = data
         .iter()
         .skip(start)
-        .take(16)
+        .take(8)
         .collect::<BitVec>()
         .to_bytes()
         .try_into()
         .unwrap();
-    u16::from_be_bytes(bytes)
+    bytes[0]
 }
 
 fn check_within_bounds(data: &BitVec, start: usize, len: usize) -> bool {
