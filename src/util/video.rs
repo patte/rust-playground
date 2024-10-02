@@ -5,9 +5,9 @@ use std::process::Command;
 
 pub fn write_video(data: &BitVec, fps: u32, width: u32, height: u32) {
     let total_frames = data.len();
-    let duration_seconds = (total_frames as f64 / fps as f64).ceil();
+    let duration_seconds = total_frames as f64 / fps as f64;
     println!(
-        "Total frames: {} duration: {}",
+        "Total frames: {} duration: {}s",
         total_frames, duration_seconds
     );
 
@@ -47,6 +47,9 @@ pub fn write_video(data: &BitVec, fps: u32, width: u32, height: u32) {
             //"-t",
             //&duration_seconds.to_string(),
             "-y",
+            "-hide_banner",
+            "-loglevel",
+            "error",
             output_video,
         ])
         .status()
@@ -57,6 +60,8 @@ pub fn write_video(data: &BitVec, fps: u32, width: u32, height: u32) {
     } else {
         eprintln!("Error: Failed to generate video");
     }
+
+    fs::remove_dir_all(frames_dir).ok();
 }
 
 //use ffmpeg_next::software::scaling;
