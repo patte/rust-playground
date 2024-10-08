@@ -22,6 +22,11 @@ nokhwa = { git = "https://github.com/victormaximchuk19/nokhwa", branch = "0.10",
 lz4_flex = "0.11.3"
 human_bytes = { version = "0.4", default-features = false }
 humanize-duration = "0.0.6"
+opencv = { version = "0.93.1", features = [
+    "clang-runtime",
+    "videoio",
+    "highgui",
+] }
 
 [[bin]]
 name = "video_signal"
@@ -34,3 +39,7 @@ path = "src/stream_nokhwa.rs"
 [[bin]]
 name = "compress"
 path = "src/compress.rs"
+
+[[bin]]
+name = "video_capture_http_stream"
+path = "src/video_capture_http_stream.rs"
