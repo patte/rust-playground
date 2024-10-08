@@ -11,28 +11,29 @@ cargo run --bin [compress|stream_nokhwa|video_signal]
 
 ### lz4 compression
 ```bash
-cargo run --bin compress
+cargo run --bin compress --release
+
 random bytes: 1.3 GB
 Allocating...
-Took: 114µs 875ns
+Took: 82µs 625ns
 
 Filling vector with random data...
-Took: 1s 497ms 637µs 750ns
+Took: 63ms 149µs 42ns
 
 Compressing data...
-Speed: 187.8 MB/s
-Took: 6s 657ms 178µs 250ns
+Speed: 9.8 GB/s
+Took: 126ms 928µs 250ns
 
 Calculating sizes...
-Took: 834ns
+Took: 792ns
 
 Original size: 1.3 GB
 Compressed size: 4.9 MB
 Compression ratio: 0.0039
 
 Decompressing and verifying data..
-Speed: 216 MB/s
-Took: 5s 786ms 288µs 916ns
+Speed: 4.6 GB/s
+Took: 272ms 231µs 166ns
 
 Outputting PNG images...
 PNG image will contain 125 KB
@@ -41,8 +42,8 @@ Saved uncompressed.png image
 PNG image will contain 125 KB
 Creating image of size 1001x1001
 Saved compressed.png image
-Took: 352ms 414µs 625ns
+Took: 7ms 461µs 292ns
 
-Total execution time: 14s 294ms 296µs 708ns
+Total execution time: 470ms 129µs 791ns
 ```
 Machine: MacBook Air 2023 M2 24GB
