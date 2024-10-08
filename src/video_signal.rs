@@ -6,6 +6,7 @@ mod util;
 
 const FPS: u32 = 30;
 
+// send and receive data using video
 fn main() {
     let encoded_data = BitVec::from_bytes(&[0b11001110, 0b00110001]);
     let decoded_package = send_receive(&encoded_data);

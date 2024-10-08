@@ -72,8 +72,10 @@ fn nokhwa_main() {
     cb.stop_stream().unwrap();
 
     let mut counter = 0;
+    // makedir
+    std::fs::create_dir("stream_frames").unwrap_or_default();
     for frame in frames.lock().unwrap().iter() {
-        let path_new = "frames/".to_string() + &counter.to_string() + ".png";
+        let path_new = "stream_frames/".to_string() + &counter.to_string() + ".png";
         counter += 1;
         frame.save(path_new).unwrap();
     }

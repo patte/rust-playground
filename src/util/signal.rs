@@ -1,15 +1,40 @@
 use bit_vec::BitVec;
 use crc::{Crc, CRC_8_BLUETOOTH};
 
-const PREABLE_LEN: usize = 8;
-const SIZE_LEN: usize = 8;
-const CRC_LEN: usize = 8;
-const CRC: Crc<u8> = Crc::<u8>::new(&CRC_8_BLUETOOTH); // 8-bit CRC
+// 16-bit vs 8-bit headers, 30fps
+//
+// # 16-bit headers
+// frames: 62 duration: 2.066666666666667s
+// Video saved as output.mp4
+// Size package: 62 payload: 16, ratio: 0.258 duration: 2.067s
+// Decoded: BitVec { storage: "1100111000110001", nbits: 16 }
+//
+// frames: 238 duration: 7.933333333333334s
+// Video saved as output.mp4
+// Size package: 238 payload: 192, ratio: 0.807 duration: 7.933s
+// Decoded: Message { id: 1, content: "Hello World!" }
+//
+// # 8-bit headers
+// frames: 46 duration: 1.5333333333333334s
+// Video saved as output.mp4
+// Decoded Package: BitVec { storage: "1100111000110001", nbits: 16 }
+// Size package: 46 payload: 16, ratio: 0.348 duration: 1.533s
+// Decoded: BitVec { storage: "1100111000110001", nbits: 16 }
+//
+// frames: 222 duration: 7.4s
+// Video saved as output.mp4
+// Size package: 222 payload: 192, ratio: 0.865 duration: 7.400s
+// Decoded: Message { id: 1, content: "Hello World!" }
 
 // overhead = 8 bits preamble + 8 bits size + 8 bits CRC = 24 bits
 // => 24 bits / 30 fps = 0.8 seconds
 // 1 byte at 30 fps = 0.266 ms
 // 1 byte at 60 fps = 0.133 ms
+
+const PREABLE_LEN: usize = 8;
+const SIZE_LEN: usize = 8;
+const CRC_LEN: usize = 8;
+const CRC: Crc<u8> = Crc::<u8>::new(&CRC_8_BLUETOOTH); // 8-bit CRC
 
 pub fn get_preamble() -> BitVec {
     BitVec::from_bytes(&[0b10101010])

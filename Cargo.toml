@@ -24,12 +24,12 @@ human_bytes = { version = "0.4", default-features = false }
 humanize-duration = "0.0.6"
 
 [[bin]]
-name = "video"
-path = "src/video.rs"
+name = "video_signal"
+path = "src/video_signal.rs"
 
 [[bin]]
-name = "motion"
-path = "src/motion.rs"
+name = "stream_nokhwa"
+path = "src/stream_nokhwa.rs"
 
 [[bin]]
 name = "compress"

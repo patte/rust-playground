@@ -2,7 +2,6 @@ use humanize_duration::prelude::DurationExt;
 use humanize_duration::Truncate;
 use image::{ImageBuffer, Luma};
 use lz4_flex::block::{compress_prepend_size, decompress_size_prepended};
-use rand::Rng;
 use std::time::Instant;
 
 fn main() {
@@ -41,6 +40,10 @@ fn main() {
     let start = Instant::now();
     println!("Compressing data...");
     let compressed_data = compress_prepend_size(&random_data);
+    println!(
+        "Speed: {}/s",
+        human_bytes::human_bytes(num_bytes as f64 / start.elapsed().as_secs_f64())
+    );
     println!("Took: {}\n", start.elapsed().human(Truncate::Nano));
 
     // Timing the size calculation step
@@ -63,11 +66,15 @@ fn main() {
     println!("Compression ratio: {:.4}", compression_ratio);
 
     // Timing the decompression verification step
-    //let start = Instant::now();
-    //println!("\nDecompressing and verifying data..");
-    //let decompressed_data = decompress_size_prepended(&compressed_data).unwrap();
-    //assert_eq!(random_data, decompressed_data);
-    //println!("Took: {}\n", start.elapsed().human(Truncate::Nano));
+    let start = Instant::now();
+    println!("\nDecompressing and verifying data..");
+    let decompressed_data = decompress_size_prepended(&compressed_data).unwrap();
+    assert_eq!(random_data, decompressed_data);
+    println!(
+        "Speed: {}/s",
+        human_bytes::human_bytes(num_bytes as f64 / start.elapsed().as_secs_f64())
+    );
+    println!("Took: {}\n", start.elapsed().human(Truncate::Nano));
 
     // Timing the PNG output for uncompressed data
     println!("Outputting PNG images...");
@@ -85,8 +92,8 @@ fn main() {
 
 // Function to create a PNG image from the firstbytes
 fn output_bits_as_png(data: &[u8], file_name: &str) {
-    //let num_bytes_max = 125_000; // 1 million bits
-    let num_bytes_max = 20_000_000; // 20 million bytes -> 160 million bits
+    // let num_bytes_max = 20_000_000; // 20 million bytes -> 160 million bits
+    let num_bytes_max = 125_000; // 1 million bits
     let num_bytes = std::cmp::min(data.len(), num_bytes_max);
     println!(
         "PNG image will contain {}",
