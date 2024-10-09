@@ -4,7 +4,6 @@
 use image::{DynamicImage, ImageBuffer, RgbImage};
 use opencv::{
     core::{MatTraitConst, CV_8UC3},
-    gapi::Image,
     prelude::MatTraitConstManual,
 };
 

@@ -1,3 +1,7 @@
+/// code to read webcam, apply motion visualization, stream to mjpeg over http
+/// requires opencv to be installed. Follow:
+/// https://github.com/twistedfall/opencv-rust/blob/master/INSTALL.md
+/// Source: https://github.com/twistedfall/opencv-rust/blob/master/examples/video_capture_http_stream.rs
 use std::collections::VecDeque;
 use std::io::{Cursor, Write};
 use std::net::{SocketAddr, TcpListener};
@@ -8,6 +12,9 @@ use opencv::core::{Mat, Vector, CV_8UC3};
 use opencv::imgcodecs::{imencode, IMWRITE_JPEG_QUALITY};
 use opencv::videoio::{VideoCapture, VideoCaptureTraitConst, CAP_ANY};
 use opencv::{prelude::*, Result};
+// VideoCaptureTrait doesn't get used when binding to opencv 3.4
+#[allow(unused_imports)]
+use opencv::videoio::VideoCaptureTrait;
 
 use image::imageops::*;
 use mat2image::{bgr_buf_to_rgba_image, ToImage};
@@ -56,7 +63,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let image_format = "jpeg";
 
             // Buffer to store last `lag_frames` frames
-            let mut frame_buffer: VecDeque<Mat> = VecDeque::with_capacity(lag_frames + 1);
+            let mut frame_buffer: VecDeque<Mat> = VecDeque::with_capacity(lag_frames);
 
             loop {
                 cam.read(&mut buffer)?;
@@ -118,7 +125,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         "image" => {
-            let mut frame_buffer: VecDeque<RgbaImage> = VecDeque::with_capacity(lag_frames + 1);
+            let mut frame_buffer: VecDeque<RgbaImage> = VecDeque::with_capacity(lag_frames);
             let image_format = "jpeg";
             loop {
                 cam.read(&mut buffer)?;
@@ -185,18 +192,27 @@ fn rgb_image_to_jpeg_bytes(image: ImageBuffer<Rgb<u8>, Vec<u8>>, quality: u8) ->
     jpeg_bytes
 }
 
+// Convert RGBA8 image to RGB8 image
+// alternative: let rgb = image::DynamicImage::ImageRgba8(out_img).to_rgb8();
+// https://play.rust-lang.org/?version=stable&mode=release&edition=2018&gist=b5b7977e168b13b8377d462c8c9c8d34
 fn rgba8_to_rgb8(
     input: image::ImageBuffer<Rgba<u8>, Vec<u8>>,
 ) -> image::ImageBuffer<Rgb<u8>, Vec<u8>> {
     let width = input.width() as usize;
     let height = input.height() as usize;
 
+    // Get the raw image data as a vector
     let input: &Vec<u8> = input.as_raw();
+
+    // Allocate a new buffer for the RGB image, 3 bytes per pixel
     let mut output_data = vec![0u8; width * height * 3];
 
+    // Iterate through 4-byte chunks of the image data (RGBA bytes)
     for (output, chunk) in output_data.chunks_exact_mut(3).zip(input.chunks_exact(4)) {
+        // ... and copy each of them to output, leaving out the A byte
         output.copy_from_slice(&chunk[0..3]);
     }
 
+    // Construct a new image
     image::ImageBuffer::from_raw(width as u32, height as u32, output_data).unwrap()
 }
