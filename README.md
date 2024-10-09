@@ -4,7 +4,7 @@ Testing out rust features and libraries.
 
 ## Run
 ```bash
-cargo run --bin [compress|stream_nokhwa|video_signal]
+cargo run --bin [compress|video_signal|stream_nokhwa|stream_opencv] --release
 ```
 
 ## Examples

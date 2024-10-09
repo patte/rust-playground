@@ -1,0 +1,28 @@
+[package]
+name = "mat2image"
+version = "0.2.0"
+edition = "2021"
+license = "MIT"
+description = "Utilities to convert opencv::Mat to image::DynamicImage"
+repository = "https://github.com/rcastill/mat2image"
+exclude = ["examples/*", "Makefile"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+opencv = { version = "0.93.1", default-features = false, features = ["rgb"] }
+# Copy rgb dependency from
+# https://github.com/twistedfall/opencv-rust/blob/v0.66.0/Cargo.toml
+# version 0.8.20 doesn't contain the deficiency mentioned in
+# https://deps.rs/crate/opencv/0.59.0#vulnerabilities
+rgb = { version = "0.8.20", default-features = false }
+image = { version = "0.25", default-features = false }
+thiserror = "1.0"
+
+[dependencies.rayon]
+version = "1.5"
+optional = true
+
+[features]
+default = ["rayon"]
+experimental = []

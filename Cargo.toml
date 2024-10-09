@@ -22,11 +22,13 @@ nokhwa = { git = "https://github.com/victormaximchuk19/nokhwa", branch = "0.10",
 lz4_flex = "0.11.3"
 human_bytes = { version = "0.4", default-features = false }
 humanize-duration = "0.0.6"
+# keep in sync with vendor/mat2image/Cargo.toml
 opencv = { version = "0.93.1", features = [
     "clang-runtime",
     "videoio",
     "highgui",
 ] }
+mat2image = { path = "vendor/mat2image", features = ["experimental"] }
 
 [[bin]]
 name = "video_signal"
@@ -41,5 +43,5 @@ name = "compress"
 path = "src/compress.rs"
 
 [[bin]]
-name = "video_capture_http_stream"
-path = "src/video_capture_http_stream.rs"
+name = "stream_opencv"
+path = "src/stream_opencv.rs"

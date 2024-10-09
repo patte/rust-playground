@@ -1,0 +1,9 @@
+/target
+/Cargo.lock
+*.jpg
+!/examples/tinta_helada.jpg
+perf.data
+save_as.perf
+/run.sh
+/save_as
+rusty-tags.vi

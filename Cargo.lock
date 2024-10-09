@@ -1050,6 +1050,7 @@ dependencies = [
  "humanize-duration",
  "image 0.25.2",
  "lz4_flex",
+ "mat2image",
  "nokhwa",
  "num-complex",
  "opencv",
@@ -1106,6 +1107,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "62bb907fe88d54d8d9ce32a3cceab4218ed2f6b7d35617cafe9adf84e43919cb"
 dependencies = [
  "libc",
+]
+
+[[package]]
+name = "mat2image"
+version = "0.2.0"
+dependencies = [
+ "image 0.25.2",
+ "opencv",
+ "rayon",
+ "rgb",
+ "thiserror",
 ]
 
 [[package]]
@@ -1408,6 +1420,7 @@ dependencies = [
  "once_cell",
  "opencv-binding-generator",
  "pkg-config",
+ "rgb",
  "semver",
  "shlex",
  "vcpkg",
