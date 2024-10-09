@@ -1,4 +1,5 @@
 use std::{
+    fs,
     sync::{Arc, Mutex},
     time::Duration,
 };
@@ -67,16 +68,15 @@ fn nokhwa_main() {
 
     cb.open_stream().unwrap();
 
-    std::thread::sleep(Duration::from_secs(5));
+    std::thread::sleep(Duration::from_secs(2));
 
     cb.stop_stream().unwrap();
 
-    let mut counter = 0;
-    // makedir
-    std::fs::create_dir("stream_frames").unwrap_or_default();
-    for frame in frames.lock().unwrap().iter() {
-        let path_new = "stream_frames/".to_string() + &counter.to_string() + ".png";
-        counter += 1;
-        frame.save(path_new).unwrap();
+    let frames_dir = "frames_nokhwa";
+    fs::remove_dir_all(frames_dir).ok();
+    fs::create_dir_all(frames_dir).expect("Failed to create output directory");
+    for (i, frame) in frames.lock().unwrap().iter().enumerate() {
+        let frame_path = format!("{}/frame_{:04}.png", frames_dir, i);
+        frame.save(frame_path).unwrap();
     }
 }
